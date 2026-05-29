@@ -111,4 +111,32 @@ async function sendPriceOfferEmail({ toEmail, clientName, engineerName, total, i
   return info;
 }
 
-module.exports = { sendEmail, sendPriceOfferEmail };
+// ── Send certificate email ────────────────────────────────────────────────────
+async function sendCertificateEmail({ toEmail, clientName, engineerName, serialNumber, model, passed, certificateUrl, calibrationDate }) {
+  const templatePath = path.join(__dirname, '../views/certificate.html');
+  let html = fs.readFileSync(templatePath, 'utf8');
+  const date = calibrationDate || formatDate(new Date());
+  const result = passed ? 'PASS ✅' : 'FAIL ❌';
+
+  html = html
+    .replace(/\{\{calibration_date\}\}/g, date)
+    .replace(/\{\{client_name\}\}/g, clientName)
+    .replace(/\{\{engineer_name\}\}/g, engineerName)
+    .replace(/\{\{model\}\}/g, model)
+    .replace(/\{\{serial_number\}\}/g, serialNumber)
+    .replace(/\{\{result\}\}/g, result)
+    .replace(/\{\{certificate_url\}\}/g, certificateUrl);
+
+  const mailOptions = {
+    from: '"Caliborty – UMECC" <mohamedhessan139@gmail.com>',
+    to: toEmail,
+    subject: `Calibration Report – ${model} (${serialNumber})`,
+    html,
+  };
+
+  const info = await transporter.sendMail(mailOptions);
+  console.log('Certificate email sent:', info.messageId);
+  return info;
+}
+
+module.exports = { sendEmail, sendPriceOfferEmail, sendCertificateEmail };

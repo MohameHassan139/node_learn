@@ -1,7 +1,7 @@
 const asyncWrapper = require('../middleWare/asyncWrapper');
 const appError = require('../utils/appError');
 const httpStatusText = require('../utils/httpStatusText');
-const { sendPriceOfferEmail } = require('../utils/send_email');
+const { sendPriceOfferEmail, sendCertificateEmail } = require('../utils/send_email');
 
 // POST /api/email/price-offer
 const sendPriceOffer = asyncWrapper(async (req, res, next) => {
@@ -19,4 +19,20 @@ const sendPriceOffer = asyncWrapper(async (req, res, next) => {
   });
 });
 
-module.exports = { sendPriceOffer };
+// POST /api/email/certificate
+const sendCertificate = asyncWrapper(async (req, res, next) => {
+  const { toEmail, clientName, engineerName, serialNumber, model, passed, certificateUrl } = req.body;
+
+  if (!toEmail || !clientName || !engineerName || !serialNumber || !model || passed == null || !certificateUrl) {
+    return next(appError.createError(400, 'Missing required fields: toEmail, clientName, engineerName, serialNumber, model, passed, certificateUrl', httpStatusText.ERROR));
+  }
+
+  await sendCertificateEmail({ toEmail, clientName, engineerName, serialNumber, model, passed, certificateUrl });
+
+  res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    message: 'Certificate email sent successfully',
+  });
+});
+
+module.exports = { sendPriceOffer, sendCertificate };
