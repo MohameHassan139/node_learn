@@ -17,6 +17,9 @@ app.use("/api/courses", coursesRoute);
 // user route
 const userRoute = require('./route/user.route');
 app.use("/api/users", userRoute);
+// email route
+const emailRoute = require('./route/email.route');
+app.use("/api/email", emailRoute);
 // in case of wrong route
 app.use((req, res) => {
   res.json({ status: httpStatusText.ERROR, message: "Route not found" });

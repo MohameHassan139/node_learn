@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
     }
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
-            const error = APPError.createError( 403 ,'Invalid token', httpStatusText.FAIL);
+            const error = APPError.createError( 401 ,'Invalid token', httpStatusText.FAIL);
             return next(error);
         }
         req.user = user;
